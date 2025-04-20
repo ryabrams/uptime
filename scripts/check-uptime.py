@@ -8,7 +8,8 @@ import pytz
 
 # Constants
 SITE_URL = "https://www.ryanabrams.com"
-LOG_PATH = "logs/uptime_log.csv"
+LOG_DIR = "logs"
+LOG_PATH = os.path.join(LOG_DIR, "uptime_log.csv")
 TIMEZONE = "Asia/Jerusalem"
 
 # Email settings
@@ -17,6 +18,9 @@ SMTP_PORT = 587
 GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
 EMAIL_TO = GMAIL_ADDRESS  # Sending email to self; adjust if needed
+
+def ensure_log_directory():
+    os.makedirs(LOG_DIR, exist_ok=True)
 
 def get_local_timestamp():
     tz = pytz.timezone(TIMEZONE)
@@ -37,6 +41,7 @@ def check_site():
         return False
 
 def log_status(timestamp, status):
+    ensure_log_directory()  # Ensures logs directory exists
     file_exists = os.path.isfile(LOG_PATH)
     with open(LOG_PATH, "a", newline='') as csvfile:
         writer = csv.writer(csvfile)
