@@ -138,6 +138,6 @@ This approach prevents false alarms due to temporary network glitches by requiri
 * **Timeout and Retries:** Adjust the `TIMEOUT_SECONDS`, `RETRY_DELAY_SECONDS`, and `MAX_RETRIES` constants in the `uptime.py` script to change the timeout for website checks and the retry behavior.
 * **Logging:** The script uses the `logging` module. You can configure it to log to a file instead of or in addition to the console by adding a `logging.FileHandler` to the handlers list.
 
-##⚖️ License
+##  ⚖️ License
 
 This project is licensed under the terms of the MIT License. See the [LICENSE](LICENSE) file for details.
