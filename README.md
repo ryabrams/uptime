@@ -18,7 +18,7 @@ This tool monitors a website's availability by periodically checking its HTTP st
 
 ## Project Structure
 
-,,,
+```
 uptime/
 ├── .github/workflows/
 │   └── uptime.yml
@@ -26,7 +26,7 @@ uptime/
 ├── README.md
 ├── requirements.txt
 └── LICENSE
-,,,
+```
 
 ## Setup
 
