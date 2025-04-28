@@ -1,10 +1,10 @@
-# Uptime Monitor
+# ✅ Uptime Monitor
 
-## Description
+## ✏️ Description
 
 This tool monitors a website's availability by periodically checking its HTTP status. If the website is down, it sends an email notification via Gmail.  It is designed to be run as a GitHub Action.
 
-## Features
+## ⚡️ Features
 
 * **Regular Checks:** Pings a specified website URL every 30 minutes.
 * **Downtime Detection:** Performs a secondary check after an initial failure to confirm downtime.
@@ -16,7 +16,7 @@ This tool monitors a website's availability by periodically checking its HTTP st
 * **Retry Mechanism:** Retries the website check a configurable number of times to handle transient errors.
 * **Detailed Logging:** Provides detailed logging of the check process, including timestamps and error messages.
 
-## Project Structure
+## 🧩 Project Structure
 
 ```
 uptime/
@@ -28,7 +28,7 @@ uptime/
 └── LICENSE
 ```
 
-## Setup
+## 🔨 Setup
 
 ### Prerequisites
 
@@ -97,7 +97,7 @@ uptime/
 4.  **Commit and Push:**
     * Commit the `uptime.py` script, the `.github/workflows/uptime.yml` file, the `README.md`, the `requirements.txt`, and the `LICENSE` file to your GitHub repository.
 
-##  Explanation
+##  📣 Explanation
 
 ###   Logic for Downtime Detection and Recovery Notification
 
@@ -111,7 +111,7 @@ uptime/
 
 This approach prevents false alarms due to temporary network glitches by requiring consecutive failed checks before declaring a website as down. The use of the `PREVIOUSLY_DOWN` environment variable ensures that a recovery email is sent only after a confirmed downtime event.
 
-##  Troubleshooting
+##  ⚠️ Troubleshooting
 
 * **Email Notifications Not Received:**
     * Double-check that you have correctly configured the `GMAIL_EMAIL`, `GMAIL_PASSWORD`, and `RECIPIENT_EMAIL` secrets in your GitHub repository.
@@ -131,13 +131,13 @@ This approach prevents false alarms due to temporary network glitches by requiri
     * The script includes a retry mechanism to handle these. Check the number of retries and the delay.
     * Check the website's server logs for intermittent errors.
 
-##  Customization
+##  ♻️ Customization
 
 * **Check Frequency:** Change the `cron` expression in the `.github/workflows/uptime.yml` file to adjust how often the website is checked. The current setting is `*/30 * * * *` (every 30 minutes).
 * **Email Content:** Modify the `send_email` function in the `uptime.py` script to customize the subject and body of the email notifications.
 * **Timeout and Retries:** Adjust the `TIMEOUT_SECONDS`, `RETRY_DELAY_SECONDS`, and `MAX_RETRIES` constants in the `uptime.py` script to change the timeout for website checks and the retry behavior.
 * **Logging:** The script uses the `logging` module. You can configure it to log to a file instead of or in addition to the console by adding a `logging.FileHandler` to the handlers list.
 
-## License
+##⚖️ License
 
 This project is licensed under the terms of the MIT License. See the [LICENSE](LICENSE) file for details.
