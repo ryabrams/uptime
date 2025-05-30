@@ -1,0 +1,12 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Local env files & virtualenvs
+.env
+venv/
+.venv/
+
+# Distribution / build artifacts
+build/
+dist/
