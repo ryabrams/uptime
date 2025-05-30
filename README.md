@@ -10,6 +10,7 @@ A GitHub-hosted, Python-powered website uptime monitor.
 ---
 
 ## Features
+
 - **Automated Pings**: HTTP GET every 30 minutes  
 - **Downtime Confirmation**: 2 min retry before alert  
 - **Recovery Alerts**: Notifies when site is back up  
@@ -20,7 +21,8 @@ A GitHub-hosted, Python-powered website uptime monitor.
 ---
 
 ## Repository Structure
-```
+
+```bash
 .
 ├── .github/
 │   └── workflows/uptime-checker.yml
@@ -40,6 +42,7 @@ A GitHub-hosted, Python-powered website uptime monitor.
 ## Getting Started
 
 1. **Clone repo**  
+
    ```bash
    git clone https://github.com/youruser/uptime-monitor.git
    cd uptime-monitor
@@ -59,6 +62,7 @@ A GitHub-hosted, Python-powered website uptime monitor.
      - `MAILGUN_DOMAIN`  
 
 3. **Push first commit**  
+
    ```bash
    git add .
    git commit -m "Initial setup"
@@ -83,7 +87,8 @@ A GitHub-hosted, Python-powered website uptime monitor.
 ## Accessing Logs
 
 Open `logs/checks.log` in the repo to view a history like:  
-```
+
+```text
 2025-05-29T14:00:00 UTC | https://example.com | DOWN | 502
 ```
 
