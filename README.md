@@ -1,30 +1,48 @@
 # Uptime Checker
 
-A simple website uptime monitor that runs on GitHub Actions every 15 minutes. When your site goes down, it notifies you via **email** and **Telegram**.
+A simple website uptime monitor that runs on GitHub Actions every 15 minutes. When your site goes down, it notifies you via **email**, **Telegram**, or both — configure whichever channels you want.
 
 ## How It Works
 
 1. GitHub Actions runs `check_uptime.py` on a schedule (`*/15 * * * *`).
 2. The script makes an HTTP GET request to `SITE_URL`.
 3. A non-2xx status code or connection failure is treated as **down**.
-4. When down: sends an email alert and a Telegram message.
+4. When down: sends an alert on every configured channel (email and/or Telegram).
 5. When up: logs a success message and does nothing.
 
 ## Setup
 
 ### 1. Add GitHub Secrets
 
-Go to your repo → **Settings → Secrets and variables → Actions → New repository secret** and add each of the following:
+Go to your repo → **Settings → Secrets and variables → Actions → New repository secret**.
+
+`SITE_URL` is always required. Beyond that, you choose your notification
+channels: configure the **email** group, the **Telegram** group, or both. You
+must enable **at least one** channel, and each channel must be configured
+**completely** — if you set some of a channel's variables but not all, the run
+fails with an error listing what's missing.
+
+**Always required**
 
 | Secret | Description |
 |---|---|
 | `SITE_URL` | Full URL to monitor, e.g. `https://example.com` |
+
+**Email channel** (set all six to enable, or omit all to skip)
+
+| Secret | Description |
+|---|---|
 | `SMTP_HOST` | SMTP server, e.g. `smtp.gmail.com` |
 | `SMTP_PORT` | `587` for STARTTLS, `465` for SSL |
 | `SMTP_USERNAME` | SMTP login username |
 | `SMTP_PASSWORD` | SMTP password or App Password |
 | `EMAIL_FROM` | Sender address shown in the From header |
 | `EMAIL_TO` | Recipient address(es), comma-separated for multiple |
+
+**Telegram channel** (set both to enable, or omit both to skip)
+
+| Secret | Description |
+|---|---|
 | `TELEGRAM_BOT_TOKEN` | Token from [@BotFather](https://t.me/BotFather) |
 | `TELEGRAM_CHAT_ID` | Chat ID to send alerts to (see below) |
 

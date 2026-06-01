@@ -6,28 +6,60 @@ from email.mime.text import MIMEText
 
 import requests
 
-REQUIRED_VARS = [
-    "SITE_URL",
+SMTP_VARS = [
     "SMTP_HOST",
     "SMTP_PORT",
     "SMTP_USERNAME",
     "SMTP_PASSWORD",
     "EMAIL_FROM",
     "EMAIL_TO",
+]
+
+TELEGRAM_VARS = [
     "TELEGRAM_BOT_TOKEN",
     "TELEGRAM_CHAT_ID",
 ]
 
 
+def _channel_state(name, variables):
+    """Return whether a notification channel is fully configured.
+
+    A channel counts as enabled only when all of its variables are set. If
+    some — but not all — are set, that's a misconfiguration and we exit.
+    """
+    present = [v for v in variables if os.environ.get(v)]
+    if not present:
+        return False
+    if len(present) != len(variables):
+        missing = [v for v in variables if not os.environ.get(v)]
+        print(
+            f"ERROR: {name} is partially configured. Missing: {', '.join(missing)}"
+        )
+        sys.exit(1)
+    return True
+
+
 def validate_env():
-    missing = [v for v in REQUIRED_VARS if not os.environ.get(v)]
-    if missing:
-        print(f"ERROR: Missing required environment variables: {', '.join(missing)}")
+    if not os.environ.get("SITE_URL"):
+        print("ERROR: Missing required environment variable: SITE_URL")
         sys.exit(1)
     url = os.environ["SITE_URL"]
     if not url.startswith("http://") and not url.startswith("https://"):
         print(f"ERROR: SITE_URL must start with http:// or https:// (got: {url!r})")
         sys.exit(1)
+
+    email_enabled = _channel_state("SMTP/email", SMTP_VARS)
+    telegram_enabled = _channel_state("Telegram", TELEGRAM_VARS)
+
+    if not email_enabled and not telegram_enabled:
+        print(
+            "ERROR: No notification channel configured. Set the SMTP/email "
+            f"variables ({', '.join(SMTP_VARS)}) and/or the Telegram variables "
+            f"({', '.join(TELEGRAM_VARS)})."
+        )
+        sys.exit(1)
+
+    return email_enabled, telegram_enabled
 
 
 def check_site(url):
@@ -93,21 +125,23 @@ def send_telegram(message):
 
 
 def main():
-    validate_env()
+    email_enabled, telegram_enabled = validate_env()
 
     site_url = os.environ["SITE_URL"]
     is_up, detail = check_site(site_url)
 
     if not is_up:
         print(f"DOWN: {site_url} — {detail}")
-        send_email(
-            subject=f"[ALERT] {site_url} is DOWN",
-            body=f"Your site appears to be down.\n\nURL: {site_url}\nDetail: {detail}",
-        )
-        send_telegram(
-            f"<b>ALERT</b>: <a href='{site_url}'>{site_url}</a> is <b>DOWN</b>\n"
-            f"Detail: {detail}"
-        )
+        if email_enabled:
+            send_email(
+                subject=f"[ALERT] {site_url} is DOWN",
+                body=f"Your site appears to be down.\n\nURL: {site_url}\nDetail: {detail}",
+            )
+        if telegram_enabled:
+            send_telegram(
+                f"<b>ALERT</b>: <a href='{site_url}'>{site_url}</a> is <b>DOWN</b>\n"
+                f"Detail: {detail}"
+            )
     else:
         print(f"UP: {site_url} — {detail}")
 
