@@ -1,10 +1,10 @@
 # Uptime Checker
 
-A simple website uptime monitor that runs on GitHub Actions every 15 minutes. When your site goes down, it notifies you via **email**, **Telegram**, or both — configure whichever channels you want.
+A simple website uptime monitor that runs on GitHub Actions every 30 minutes. When your site goes down, it notifies you via **email**, **Telegram**, or both — configure whichever channels you want.
 
 ## How It Works
 
-1. GitHub Actions runs `check_uptime.py` on a schedule (`*/15 * * * *`).
+1. GitHub Actions runs `check_uptime.py` on a schedule (`*/30 * * * *`).
 2. The script makes an HTTP GET request to `SITE_URL`.
 3. A non-2xx status code or connection failure is treated as **down**.
 4. When down: sends an alert on every configured channel (email and/or Telegram).
@@ -56,7 +56,7 @@ Check the run logs to confirm each notification channel succeeded.
 
 ### 3. Let It Run
 
-The workflow runs automatically every 15 minutes. No further action needed.
+The workflow runs automatically every 30 minutes. No further action needed.
 
 ---
 
