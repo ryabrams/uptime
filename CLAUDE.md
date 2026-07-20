@@ -35,9 +35,9 @@ At least one full channel must be configured or the script exits with an error.
 
 ## Git workflow
 
-- Always develop on the `dev` branch
-- Ask before committing/merging to `main`
-- After any merge to `main`, confirm both branches are in sync
+- Always develop and commit on the `dev` branch
+- Never merge to `main` without explicit user approval — always ask first
+- When approved, merge dev into main, push both, and confirm they are in sync
 
 ## Key conventions
 
