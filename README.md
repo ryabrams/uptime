@@ -7,8 +7,9 @@ A simple website uptime monitor that runs on GitHub Actions every 30 minutes. Wh
 1. GitHub Actions runs `check_uptime.py` on a schedule (`*/30 * * * *`).
 2. The script makes an HTTP GET request to `SITE_URL`.
 3. A non-2xx status code or connection failure is treated as **down**.
-4. When down: sends an alert on every configured channel (email and/or Telegram).
-5. When up: logs a success message and does nothing.
+4. Every check (up or down) is logged to `logs/log.csv` with timestamp, status, detail, and response time.
+5. When down: sends an alert on every configured channel (email and/or Telegram).
+6. When up: prints a success message and does nothing else.
 
 ## Setup
 

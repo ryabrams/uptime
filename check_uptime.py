@@ -131,7 +131,7 @@ def send_telegram(message):
 
 
 def log_check(url, status, detail, response_time_ms):
-    log_path = Path(__file__).resolve().parent / "logs" / "uptime.csv"
+    log_path = Path(__file__).resolve().parent / "logs" / "log.csv"
     write_header = not log_path.exists() or log_path.stat().st_size == 0
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with open(log_path, "a", newline="") as f:
