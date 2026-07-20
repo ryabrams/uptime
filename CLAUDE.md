@@ -33,6 +33,12 @@ All configuration is via env vars (GitHub Secrets in CI):
 
 At least one full channel must be configured or the script exits with an error.
 
+## Git workflow
+
+- Always develop on the `dev` branch
+- Ask before committing/merging to `main`
+- After any merge to `main`, confirm both branches are in sync
+
 ## Key conventions
 
 - Python 3.12, no type annotations, no tests, no linter config
