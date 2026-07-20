@@ -1,8 +1,12 @@
+import csv
 import os
 import sys
 import smtplib
 import ssl
+import time
+from datetime import datetime, timezone
 from email.mime.text import MIMEText
+from pathlib import Path
 
 import requests
 
@@ -64,16 +68,18 @@ def validate_env():
 
 def check_site(url):
     try:
+        start = time.time()
         resp = requests.get(url, timeout=15, allow_redirects=True)
+        elapsed_ms = round((time.time() - start) * 1000)
         if 200 <= resp.status_code < 300:
-            return True, f"HTTP {resp.status_code}"
-        return False, f"HTTP {resp.status_code}"
+            return True, f"HTTP {resp.status_code}", elapsed_ms
+        return False, f"HTTP {resp.status_code}", elapsed_ms
     except requests.exceptions.Timeout:
-        return False, "Connection timed out after 15s"
+        return False, "Connection timed out after 15s", None
     except requests.exceptions.ConnectionError as e:
-        return False, f"Connection error: {e}"
+        return False, f"Connection error: {e}", None
     except Exception as e:
-        return False, f"Unexpected error: {e}"
+        return False, f"Unexpected error: {e}", None
 
 
 def send_email(subject, body):
@@ -124,11 +130,31 @@ def send_telegram(message):
         print(f"  [telegram] FAILED: {e}")
 
 
+def log_check(url, status, detail, response_time_ms):
+    log_path = Path(__file__).resolve().parent / "logs" / "uptime.csv"
+    write_header = not log_path.exists() or log_path.stat().st_size == 0
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(log_path, "a", newline="") as f:
+        writer = csv.writer(f)
+        if write_header:
+            writer.writerow(["timestamp", "url", "status", "detail", "response_time_ms"])
+        writer.writerow([
+            datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            url,
+            status,
+            detail,
+            response_time_ms if response_time_ms is not None else "",
+        ])
+
+
 def main():
     email_enabled, telegram_enabled = validate_env()
 
     site_url = os.environ["SITE_URL"]
-    is_up, detail = check_site(site_url)
+    is_up, detail, response_time_ms = check_site(site_url)
+
+    status = "up" if is_up else "down"
+    log_check(site_url, status, detail, response_time_ms)
 
     if not is_up:
         print(f"DOWN: {site_url} — {detail}")
