@@ -165,8 +165,9 @@ def main():
             )
         if telegram_enabled:
             send_telegram(
-                f"<b>ALERT</b>: <a href='{site_url}'>{site_url}</a> is <b>DOWN</b>\n"
-                f"Detail: {detail}"
+                f"⚠️⚠️⚠️\n\n"
+                f"{site_url} is DOWN\n"
+                f"Details: {detail}"
             )
     else:
         print(f"UP: {site_url} — {detail}")
