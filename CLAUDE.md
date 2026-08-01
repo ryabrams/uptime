@@ -7,9 +7,13 @@ Simple website uptime monitor. A single Python script (`check_uptime.py`) runs e
 ## Architecture
 
 - `check_uptime.py` — entire application; no modules, no classes, just functions
-- `.github/workflows/uptime.yml` — scheduled workflow; commits the updated log CSV back to the repo
-- `logs/log.csv` — append-only check history (timestamp, url, status, detail, response_time_ms)
-- `requirements.txt` — sole dependency is `requests`
+  - `validate_env()` — requires `SITE_URL` plus at least one fully configured notification channel; returns which channels are enabled
+  - `check_site()` — single HTTP GET; 2xx = up, anything else (or a connection error/timeout) = down; also measures response time
+  - `send_email()` / `send_telegram()` — one function per channel; failures are logged, never raised (a broken channel must not crash the run)
+  - `log_check()` — appends one row to `logs/log.csv`, writing the header if the file is new
+- `.github/workflows/uptime.yml` — scheduled workflow (`*/30 * * * *`) that runs the check, then commits the updated `logs/log.csv` back to the repo. Runs from the **default branch (`main`)** and needs `permissions: contents: write` to push the log commit.
+- `logs/log.csv` — append-only check history (`timestamp,url,status,detail,response_time_ms`)
+- `requirements.txt` — sole dependency is `requests` (pinned)
 
 ## Running locally
 
@@ -27,17 +31,46 @@ python check_uptime.py
 
 All configuration is via env vars (GitHub Secrets in CI):
 
-- `SITE_URL` (required) — URL to check
+- `SITE_URL` (required) — URL to check; must start with `http://` or `https://`
 - Email channel: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `EMAIL_FROM`, `EMAIL_TO`
 - Telegram channel: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
 
-At least one full channel must be configured or the script exits with an error.
+Each channel is all-or-nothing: set **every** var in a group to enable it, or none to skip it. A partially configured channel exits with an error. At least one full channel must be configured or the script exits with an error.
 
 ## Git workflow
 
-- Always develop and commit on the `dev` branch
-- Never merge to `main` without explicit user approval — always ask first
-- When approved, merge dev into main, push both, and confirm they are in sync
+### Branches
+
+- **`dev`** — the working/integration branch. All development happens here.
+- **`main`** — the production/default branch. GitHub Actions runs the scheduled workflow from `main`, and the CI bot pushes `log: uptime check ...` commits to `logs/log.csv` on `main` every 30 minutes. As a result, **`main` continuously gains log commits that `dev` does not have.**
+
+### Rules
+
+1. **Always work on `dev`.** Create and commit every change on `dev`. Never commit source changes directly to `main`.
+2. **Always ask before pushing to `main`.** Never push or merge to `main` without explicit user approval — ask first, every time.
+3. **Always keep `main` and `dev` in sync.** They diverge by design (CI appends logs to `main`; features land on `dev`), so "in sync" means **neither branch is missing the other's commits for any tracked file except `logs/log.csv`**, whose CI appends on `main` are expected to run ahead between syncs.
+
+### Sync procedure (after an approved merge to `main`)
+
+Once the user approves releasing `dev` to `main`:
+
+```bash
+# 1. Merge dev into main and push
+git checkout main && git pull origin main
+git merge dev
+git push origin main            # only after user approval
+
+# 2. Merge main back into dev (pulls the CI log commits + the merge) and push
+git checkout dev
+git merge main
+git push origin dev
+
+# 3. Verify they are in sync (source identical; only logs/log.csv may differ)
+git diff origin/main origin/dev -- . ':!logs/log.csv'   # expect no output
+```
+
+Before starting new work, first sync `dev` with the latest `main`
+(`git checkout dev && git merge origin/main`) so you build on current logs and released code.
 
 ## Key conventions
 
