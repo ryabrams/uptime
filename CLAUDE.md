@@ -57,12 +57,12 @@ Once the user approves releasing `dev` to `main`:
 ```bash
 # 1. Merge dev into main and push
 git checkout main && git pull origin main
-git merge dev
+git merge dev --no-edit         # a MERGE COMMIT, not a fast-forward (see gotchas)
 git push origin main            # only after user approval
 
 # 2. Merge main back into dev (pulls the CI log commits + the merge) and push
 git checkout dev
-git merge main
+git merge main --no-edit
 git push origin dev
 
 # 3. Verify they are in sync (source identical; only logs/log.csv may differ)
@@ -71,6 +71,20 @@ git diff origin/main origin/dev -- . ':!logs/log.csv'   # expect no output
 
 Before starting new work, first sync `dev` with the latest `main`
 (`git checkout dev && git merge origin/main`) so you build on current logs and released code.
+
+### Gotchas (learned the hard way)
+
+- **The `dev → main` merge is normally a merge commit, not a fast-forward.**
+  Because CI keeps appending `log:` commits to `main`, `main` and `dev` each
+  get ahead of the other between syncs (main on logs, dev on features). Neither
+  is an ancestor of the other, so a plain `git merge dev` must create a merge
+  commit. **Do not force `--ff-only` on step 1** — it will abort with
+  "Not possible to fast-forward". (Step 1's merge only fast-forwards if step 2
+  already ran, making `dev` a descendant of `main`.)
+- **Verify the ref actually moved; don't trust command output.** After
+  `git push origin main`, confirm with `git log -1 --oneline origin/main` (or the
+  step-3 diff). Piping a git command through `head`/`tail` masks its exit code,
+  so a failed merge can look like it succeeded — always check the end state.
 
 ## Key conventions
 
