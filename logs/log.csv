@@ -1059,3 +1059,4 @@ timestamp,url,status,detail,response_time_ms
 2026-08-01T21:14:44Z,https://www.ryanabrams.com,up,HTTP 200,249
 2026-08-01T22:24:40Z,https://www.ryanabrams.com,up,HTTP 200,72
 2026-08-01T23:04:39Z,https://www.ryanabrams.com,up,HTTP 200,90
+2026-08-01T23:10:34Z,https://www.ryanabrams.com/355446,down,HTTP 404,84
