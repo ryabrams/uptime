@@ -57,8 +57,11 @@ Once the user approves releasing `dev` to `main`:
 ```bash
 # 1. Merge dev into main and push
 git checkout main && git pull origin main
-git merge dev --no-edit         # a MERGE COMMIT, not a fast-forward (see gotchas)
+# WARNING: this is a MERGE COMMIT, not a fast-forward (CI adds log: commits to
+# main that dev lacks). NEVER add --ff-only here — it aborts. See Gotchas below.
+git merge dev --no-edit
 git push origin main            # only after user approval
+# Then confirm the ref actually moved: git log -1 --oneline origin/main
 
 # 2. Merge main back into dev (pulls the CI log commits + the merge) and push
 git checkout dev
